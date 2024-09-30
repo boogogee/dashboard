@@ -1,0 +1,33 @@
+version: '3.8'  # A valid version for Docker Compose.
+
+services:
+  flask:
+    build: ./backend  # Points to the backend directory where the Dockerfile is located.
+    ports:
+      - "5001:5001"
+    env_file:
+    - ./backend/.env
+    volumes:
+      - ./backend/app:/app  # Mount the correct app folder into the container.
+    depends_on:
+      - db  # Ensure Flask waits for the db service to be up before starting.
+
+  react:
+    build: ./frontend  # Points to the frontend directory where the Dockerfile is located.
+    ports:
+      - "3000:3000"  # Exposes React on port 3000.
+
+  db:
+    image: mysql:5.7
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpass
+      MYSQL_DATABASE: DashboardDB
+      MYSQL_USER: dashboard_user
+      MYSQL_PASSWORD: your_password
+    ports:
+      - "3306:3306"  # Exposes MySQL on port 3306.
+    volumes:
+      - db_data:/var/lib/mysql  # Ensures the MySQL data persists.
+
+volumes:
+  db_data:  # Named volume for persisting database data.
